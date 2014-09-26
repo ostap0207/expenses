@@ -2,3 +2,4 @@ com\maliuvanchuk\model\User.class
 com\maliuvanchuk\controller\PurchaseController.class
 com\maliuvanchuk\repository\PurchaseRepository.class
 com\maliuvanchuk\model\Purchase.class
+com\maliuvanchuk\SimpleDBConfig.class

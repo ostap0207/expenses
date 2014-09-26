@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
 <head lang="en">
@@ -6,61 +7,42 @@
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
     <title>Expenses</title>
 </head>
+<style>
+
+    .name{
+        text-align: center;
+    }
+   table td:first-child{
+       border-right: 1px solid black;
+       height: 100%;
+   }
+</style>
 <body>
 <div class="table-responsive">
 <table class="table">
     <thead>
-        <tr><th>Ostap</th><th>Diego</th></tr>
+        <tr><th>Name</th><th class="name">Ostap</th><th class="name">Diego</th></tr>
     </thead>
     <tbody>
-    <tr><center><span th:text = "${status}"></span></center><td colspan="2"></td></tr>
-    <tr><td>
-
-        <form class="form-horizontal" role="form" th:object="${purchase}" th:method="post" th:action="@{/add}" >
-            <input type="hidden" name="buyer" value="Ostap"/>
-            <input type="text" th:field="*{title}" placeholder="Title"/>
-            <input type="text" th:field="*{amount}" placeholder="Price"/>
-            <button class="btn btn-default" type="submit"><span>Add</span></button>
-        </form>
-    </td>
-        <td>
-            <form class="form-horizontal" role="form" th:object="${purchase}" th:method="post" th:action="@{/add}" >
-                <input type="hidden" name="buyer" value="Diego"/>
-                <input type="text" th:field="*{title}" placeholder="Title"/>
-                <input type="text" th:field="*{amount}" placeholder="Price"/>
-                <button class="btn btn-default" type="submit"><span>Add</span></button>
-            </form>
-        </td></tr>
-
+    <tr><td></td><td colspan="2" style="text-align: center"><span th:text = "${status}"></span></td></tr>
+    <tr><td>Total for current month</td><td style="text-align: center"><span th:text = "${ostapSum}"></span></td><td style="text-align: center"><span th:text = "${diegoSum}"></span></td></tr>
     <tr>
+        <td>Add a purchase</td>
         <td>
-            <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-                <tbody>
-                <tr th:each="purchase : ${ostapPurchases}">
-                    <td th:text="${purchase.title}"></td>
-                    <td th:text="${purchase.amount}"></td>
-                    <td th:text="${purchase.date}"></td>
-                </tr>
-                </tbody>
-            </table>
-                </div>
-
+            <div th:include="fragments::form (${'Ostap'},${purchase})">...</div>
+        </td>
+        <td>
+            <div th:include="fragments::form (${'Diego'},${purchase})">...</div>
+        </td>
+    </tr>
+    <tr>
+        <td>List of purchases</td>
+        <td>
+            <div th:include="fragments::list (${ostapPurchases})">...</div>
         </td>
 
         <td>
-            <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-                <tbody>
-                <tr th:each="purchase : ${diegoPurchases}">
-                    <td th:text="${purchase.title}"></td>
-                    <td th:text="${purchase.amount}"></td>
-                    <td th:text="${purchase.date}"></td>
-                </tr>
-                </tbody>
-            </table>
-                </div>
-
+            <div th:include="fragments::list (${diegoPurchases})">...</div>
         </td>
     </tr>
 

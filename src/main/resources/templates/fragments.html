@@ -1,0 +1,35 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<div th:fragment="list (purchases)">
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <tbody>
+            <tr th:each="purchase : ${purchases}">
+                <td th:text="${purchase.title}"></td>
+                <td th:text="${purchase.amount}"></td>
+                <td th:text="${#calendars.format(purchase.date,'dd MMMM yyyy')}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div th:fragment="form (buyer,purchase)">
+        <form class="form-inline" role="form" th:object="${purchase}" th:method="post" th:action="@{/add}" >
+                    <input type="hidden" name="buyer" th:value="${buyer}"/>
+                    <input class="form-control" type="text" th:field="*{title}" placeholder="Title"/>
+                    <input class="form-control" type="text" th:field="*{amount}" placeholder="Price"/>
+                    <button class="btn btn-default" type="submit"><span>Add</span></button>
+        </form>
+    </div>
+
+</body>
+
+<div th:fragment="summary (totalMonth, total)">
+
+</div>
+
+</html>

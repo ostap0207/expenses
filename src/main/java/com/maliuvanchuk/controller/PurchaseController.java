@@ -9,7 +9,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.text.NumberFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by ostap_000 on 9/24/2014.
@@ -22,7 +28,7 @@ public class PurchaseController {
 
     public static final String NAME1 = "Ostap";
     public static final String NAME2 = "Diego";
-    String status = "%s owes %s %f EUR";
+    String status = "%s owes %s %s EUR";
 
     @RequestMapping("/")
     public String index(Model model){
@@ -32,16 +38,29 @@ public class PurchaseController {
         diegosSum = diegosSum == null ? 0 : diegosSum;
         String filledStatus;
         if (ostapsSum > diegosSum){
-            filledStatus = String.format(status, NAME2, NAME1,ostapsSum - diegosSum);
+            filledStatus = makeStatus(status, NAME2, NAME1, ostapsSum - diegosSum);
         }else{
-            filledStatus = String.format(status, NAME1, NAME2, -ostapsSum + diegosSum);
+            filledStatus = makeStatus(status, NAME1, NAME2, - ostapsSum + diegosSum);
         }
 
         model.addAttribute("status",filledStatus);
         model.addAttribute("ostapPurchases",repo.findByBuyerLikeOrderByDateDesc(NAME1));
         model.addAttribute("diegoPurchases",repo.findByBuyerLikeOrderByDateDesc(NAME2));
         model.addAttribute("purchase",new Purchase());
+
+
+        Date monthStart = Date.from(LocalDate.now().withDayOfMonth(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+        Date monthEnd = Date.from(LocalDate.now().with(TemporalAdjusters.lastDayOfMonth()).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+        System.out.println(monthStart.toString());
+
+        model.addAttribute("ostapSum", repo.findSumForNameBetweenDates(NAME1, monthStart, monthEnd));
+        model.addAttribute("diegoSum",repo.findSumForNameBetweenDates(NAME2, monthStart, monthEnd));
+
         return "index";
+    }
+
+    private String makeStatus(String status, String name1,String name2,float sum){
+        return String.format(status, name1, name2, NumberFormat.getNumberInstance().format(sum));
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
