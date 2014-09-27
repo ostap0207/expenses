@@ -16,6 +16,7 @@ import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Optional;
 
 /**
  * Created by ostap_000 on 9/24/2014.
@@ -32,18 +33,19 @@ public class PurchaseController {
 
     @RequestMapping("/")
     public String index(Model model){
-        Float ostapsSum = repo.findSumForName(NAME1);
-        ostapsSum = ostapsSum == null ? 0 : ostapsSum;
-        Float diegosSum = repo.findSumForName(NAME2);
-        diegosSum = diegosSum == null ? 0 : diegosSum;
+        Float ostapsSum = Optional.ofNullable(repo.findSumForName(NAME1)).orElse(0.0f).floatValue();
+        Float diegosSum = Optional.ofNullable(repo.findSumForName(NAME2)).orElse(0.0f).floatValue();
+        Float totalDiff = Math.abs(ostapsSum - diegosSum);
+
         String filledStatus;
         if (ostapsSum > diegosSum){
-            filledStatus = makeStatus(status, NAME2, NAME1, ostapsSum - diegosSum);
+            filledStatus = formatStatus(status, NAME2, NAME1, totalDiff/2);
         }else{
-            filledStatus = makeStatus(status, NAME1, NAME2, - ostapsSum + diegosSum);
+            filledStatus = formatStatus(status, NAME1, NAME2, totalDiff/2);
         }
 
         model.addAttribute("status",filledStatus);
+        model.addAttribute("totalDiff",totalDiff);
         model.addAttribute("ostapPurchases",repo.findByBuyerLikeOrderByDateDesc(NAME1));
         model.addAttribute("diegoPurchases",repo.findByBuyerLikeOrderByDateDesc(NAME2));
         model.addAttribute("purchase",new Purchase());
@@ -59,7 +61,8 @@ public class PurchaseController {
         return "index";
     }
 
-    private String makeStatus(String status, String name1,String name2,float sum){
+
+    private String formatStatus(String status, String name1,String name2,float sum){
         return String.format(status, name1, name2, NumberFormat.getNumberInstance().format(sum));
     }
 
