@@ -10,13 +10,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.text.NumberFormat;
+import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Optional;
+import java.time.temporal.TemporalField;
+import java.util.*;
+import java.util.function.BinaryOperator;
+import java.util.stream.Collectors;
 
 /**
  * Created by ostap_000 on 9/24/2014.
@@ -33,8 +35,8 @@ public class PurchaseController {
 
     @RequestMapping("/")
     public String index(Model model){
-        Float ostapsSum = Optional.ofNullable(repo.findSumForName(NAME1)).orElse(0.0f).floatValue();
-        Float diegosSum = Optional.ofNullable(repo.findSumForName(NAME2)).orElse(0.0f).floatValue();
+        Float ostapsSum = normalize(repo.findSumForName(NAME1));
+        Float diegosSum = normalize(repo.findSumForName(NAME2));
         Float totalDiff = Math.abs(ostapsSum - diegosSum);
 
         String filledStatus;
@@ -50,17 +52,35 @@ public class PurchaseController {
         model.addAttribute("diegoPurchases",repo.findByBuyerLikeOrderByDateDesc(NAME2));
         model.addAttribute("purchase",new Purchase());
 
-
+        Date towMonthsAgo = Date.from(LocalDate.now().minusMonths(2).withDayOfMonth(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+        Date monthPrevStart = Date.from(LocalDate.now().minusMonths(1).withDayOfMonth(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
         Date monthStart = Date.from(LocalDate.now().withDayOfMonth(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
         Date monthEnd = Date.from(LocalDate.now().with(TemporalAdjusters.lastDayOfMonth()).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-        System.out.println(monthStart.toString());
 
-        model.addAttribute("ostapSum", repo.findSumForNameBetweenDates(NAME1, monthStart, monthEnd));
-        model.addAttribute("diegoSum",repo.findSumForNameBetweenDates(NAME2, monthStart, monthEnd));
+        model.addAttribute("ostapSum", normalize(repo.findSumForNameBetweenDates(NAME1, monthStart, monthEnd)));
+        model.addAttribute("diegoSum", normalize(repo.findSumForNameBetweenDates(NAME2, monthStart, monthEnd)));
+
+        model.addAttribute("ostapPrevSum", normalize(repo.findSumForNameBetweenDates(NAME1, monthPrevStart, monthStart)));
+        model.addAttribute("diegoPrevSum", normalize(repo.findSumForNameBetweenDates(NAME2, monthStart, monthEnd)));
+
+        List<Purchase> treeMonthPurchases = repo.findForNameBetweenDates(towMonthsAgo,monthEnd);
+        model.addAttribute("weekData",parsePurchaseData(treeMonthPurchases));
 
         return "index";
     }
 
+    private Map<LocalDate,Float> parsePurchaseData(List<Purchase> purchases){
+       return purchases.stream().collect(Collectors.groupingBy(
+               (Purchase p) -> p.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+               , Collectors.reducing(
+                        0.0f,
+                        Purchase::getAmount,
+                        Float::sum)));
+    }
+
+    private Float normalize(Float number){
+        return Optional.ofNullable(number).orElse(0.0f).floatValue();
+    }
 
     private String formatStatus(String status, String name1,String name2,float sum){
         return String.format(status, name1, name2, NumberFormat.getNumberInstance().format(sum));
