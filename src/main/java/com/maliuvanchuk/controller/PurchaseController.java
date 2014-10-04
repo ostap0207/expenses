@@ -64,7 +64,9 @@ public class PurchaseController {
         model.addAttribute("diegoPrevSum", normalize(repo.findSumForNameBetweenDates(NAME2, monthPrevStart, monthStart)));
 
         List<Purchase> treeMonthPurchases = repo.findForNameBetweenDates(towMonthsAgo,monthEnd);
-        model.addAttribute("weekData",parsePurchaseData(treeMonthPurchases));
+        Map<LocalDate,Float> weekData = parsePurchaseData(treeMonthPurchases);
+        model.addAttribute("weekDataValues",weekData.values());
+        model.addAttribute("weekDataKeys",weekData.keySet().stream().map(d -> d.toString()).collect(Collectors.toSet()));
 
         return "index";
     }
