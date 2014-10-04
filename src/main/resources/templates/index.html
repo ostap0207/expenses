@@ -41,9 +41,15 @@
             <script th:inline="javascript">
 
                 /*<![CDATA[*/
-                var values = [[${weekDataValues}]];
-                var labels = [[${weekDataKeys}]];
+                var weekData = [[${weekData}]];
                 /*]]>*/
+
+                var labels = [];
+                var values = [];
+                for (var key in weekData) {
+                    labels.push(key);
+                    values.push(weekData[key]);
+                }
 
                 var data = {
                     labels: labels,

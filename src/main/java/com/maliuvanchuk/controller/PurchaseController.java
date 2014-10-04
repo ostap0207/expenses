@@ -64,16 +64,16 @@ public class PurchaseController {
         model.addAttribute("diegoPrevSum", normalize(repo.findSumForNameBetweenDates(NAME2, monthPrevStart, monthStart)));
 
         List<Purchase> treeMonthPurchases = repo.findForNameBetweenDates(towMonthsAgo,monthEnd);
-        Map<LocalDate,Float> weekData = parsePurchaseData(treeMonthPurchases);
-        model.addAttribute("weekDataValues",weekData.values());
-        model.addAttribute("weekDataKeys",weekData.keySet().stream().map(d -> d.toString()).collect(Collectors.toSet()));
+        Map<String,Float> weekData = parsePurchaseData(treeMonthPurchases);
+        model.addAttribute("weekData",weekData);
+        //model.addAttribute("weekDataKeys",weekData.keySet().stream().map(d -> d.toString()).collect(Collectors.toSet()));
 
         return "index";
     }
 
-    private Map<LocalDate,Float> parsePurchaseData(List<Purchase> purchases){
+    private Map<String,Float> parsePurchaseData(List<Purchase> purchases){
        return purchases.stream().collect(Collectors.groupingBy(
-               (Purchase p) -> p.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+               (Purchase p) -> p.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).toString()
                , Collectors.reducing(
                         0.0f,
                         Purchase::getAmount,
