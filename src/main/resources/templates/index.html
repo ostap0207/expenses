@@ -70,19 +70,6 @@
                 var ctx = document.getElementById("myChart").getContext("2d");
                 var myLineChart = new Chart(ctx).Line(data, Chart.defaults);
             </script>
-            <!--<table class="table">-->
-                <!--<thead>-->
-                    <!--<tr>-->
-                        <!--<th>Date(from)</th>-->
-                        <!--<th>Amount</th>-->
-                    <!--</tr>-->
-                <!--</thead>-->
-                <!---->
-                <!--<tr th:each="date : ${weekData}">-->
-                    <!--<td th:text="|${date.key} EUR|">Onions</td>-->
-                    <!--<td th:text="|${date.value} EUR|">2.41</td>-->
-                <!--</tr>-->
-            <!--</table>-->
 
         </td>
     </tr>
@@ -96,12 +83,12 @@
         </td>
     </tr>
     <tr>
-        <td>List of purchases</td>
-        <td>
+        <td style="width: 16%">List of purchases</td>
+        <td style="width: 42%">
             <div th:include="fragments::list (${ostapPurchases})">...</div>
         </td>
 
-        <td>
+        <td style="width: 42%">
             <div th:include="fragments::list (${diegoPurchases})">...</div>
         </td>
     </tr>
