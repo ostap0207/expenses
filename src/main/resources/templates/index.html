@@ -42,14 +42,16 @@
 
                 /*<![CDATA[*/
                 var weekData = [[${weekData}]];
+                var keys = [[${weekDataKeys}]];
                 /*]]>*/
 
                 var labels = [];
                 var values = [];
-                for (var key in weekData) {
+
+                keys.map( function(key) {
                     labels.push(key);
                     values.push(weekData[key]);
-                }
+                })
 
                 var data = {
                     labels: labels,

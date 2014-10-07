@@ -66,7 +66,10 @@ public class PurchaseController {
         List<Purchase> treeMonthPurchases = repo.findForNameBetweenDates(towMonthsAgo,monthEnd);
         Map<String,Float> weekData = parsePurchaseData(treeMonthPurchases);
         model.addAttribute("weekData",weekData);
-        //model.addAttribute("weekDataKeys",weekData.keySet().stream().map(d -> d.toString()).collect(Collectors.toSet()));
+
+        List<String> keys = weekData.keySet().stream().collect(Collectors.toList());
+        Collections.sort(keys);
+        model.addAttribute("weekDataKeys",keys);
 
         return "index";
     }
